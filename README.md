@@ -10,10 +10,10 @@ Instead of hosting raw source code (since it's forbidden to use), **each directo
 
 Below are the initial technical breakdowns. Each link leads directly to an in-depth explanation of the system architecture, algorithms used, and its associated resources.
 
-### 🎮 [Pacman Engine](./pacman/README.md)
+### 🎮 [Pacman Engine](./Pacman/README.md)
 * **Domain:** Game Architecture & State Systems
 * **Core Focus:** Implementation of real-time game loops, strict entity collision handling, and deterministic state management using Python.
-* **Documentation Link:** [Read the Pacman Teardown](./pacman/README.md)
+* **Documentation Link:** [Read the Pacman Teardown](./Pacman/README.md)
 
 ### 🧩 [Amazing (Maze Gen)](./A_maz_ing)
 * **Domain:** Graph Theory & Procedural Generation
