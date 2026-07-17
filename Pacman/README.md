@@ -1,62 +1,113 @@
-# 👻 Pacman: Object-Oriented Arcade Engine & State Manager
+# 🟡 Pac-Man — A Python/Pygame Arcade Clone
 
-*This project has been created as part of the 42 curriculum by Mohammad Khashan and Kanaan Lafi.*
+A fully playable Pac-Man clone built from scratch in Python using **Pygame**, featuring procedurally generated mazes, BFS-driven ghost AI, a persistent JSON-based highscore board, and a complete UI flow (menu, pause, controls, game-over, scoreboard).
 
-A full-scale, object-oriented recreation of the classic Pac-Man arcade game. Built in Python using Pygame, this project demonstrates advanced system design by decoupling the core game logic from the graphical rendering engine. The system integrates an external third-party maze generation package (`mazegen-*.whl`), handles persistent local data storage, and is packaged for public distribution on itch.io.
-
----
-![alt text](<Screenshot From 2026-07-09 21-26-29.png>)
-
-## ⚙️ System Architecture & Data Flow
-
-The game operates on a strict Model-View-Controller (MVC) inspired architecture. By isolating the game state (player movement, entity collisions, score tracking) from the visual drawing functions, the codebase remains highly modular, scalable, and easy to debug. The complex interactions within the game loop are governed by this strictly decoupled architectural framework.
-
-
-
-* **MVC Flow:** The diagram visualizes how user inputs (Controller) trigger state updates (Model), which are subsequently reflected in the visual renderer (View). This prevents spaghetti code and makes the loop deterministic.
-* **JSON Storage:** Detailed data flow diagrams show exactly how the engine leverages isolated, commented JSON files (`config.json`) for initialization and sorts local JSON lists for highscore management, proving memory safety in file I/O operations.
-* **External Integration:** The diagram highlights where the imported `mazegen-*.whl` package is called to initialize the game world boundary constraints.
-
-### Configuration & State Initialization
-The game engine is dynamically configured at runtime via a custom JSON parser that supports inline comments and fallback defaults, preventing application crashes due to malformed user input.
-
-| Parameter | Type | System Impact |
-| :--- | :--- | :--- |
-| **highscore_filename** | String | Defines the target file for persistent score I/O operations. |
-| **lives** | Integer | Sets the global fail-state threshold for the player. |
-| **pacgum** | Integer | Dictates the procedural distribution density of standard points. |
-| **points_per_* ** | Integer | Controls the mathematical weighting of different collision events (pacgums, super-pacgums, edible ghosts). |
-| **seed** | Integer | Injects a fixed random seed into the external maze generator to ensure reproducibility for level 1 testing. |
-| **level_max_time** | Integer | Enforces a strict time complexity constraint on the game loop for each level. |
-
-### External Dependency Integration
-Rather than relying on internal maze logic, this engine dynamically imports the `A-Maze-ing` wheel package. During level initialization, the engine calls the external generator with the `PERFECT = False` flag to ensure the topology contains playable loops, translating the external hex-data into Pygame collision boundaries.
+This project was built to deepen my skills in **game loop architecture, pathfinding algorithms, event-driven programming, and clean object-oriented design in Python.**
 
 ---
 
-## 🧠 Core Game Logic & Features
+![alt text](<main_window.png>)
 
-![alt text](<Screenshot From 2026-07-09 21-26-49.png>)
-### Entity AI & State Machines
-The ghosts utilize basic state machines to alternate between two primary behaviors depending on the player's interactions with the environment:
-* **Chase State:** Ghosts autonomously calculate paths through the generated corridors to intercept the player coordinates.
-* **Flee State (Edible):** Triggered by Super-Pacgums. Ghost movement speed is throttled, and pathfinding logic is inverted to maximize distance from the player entity until the timer expires.
+## 🎮 Features
 
-### Persistent Highscore Architecture
-Scores are managed via a lightweight, local JSON storage system rather than a heavy database (like SQLite). 
-* **Mechanism:** The system loads existing data into memory, sorts the dictionary values, and enforces a strict Top 10 capacity limit. If a new game-over score exceeds the minimum value in the array, the lowest score is popped and the new data is serialized back to disk. 
-* **Benefits:** This ensures zero external dependencies and rapid read/write execution during the game loop transitions.
+- **10 progressively generated levels** — each level's maze is procedurally built using an external maze-generation package, with a fixed seed on level 1 for reproducibility and random generation afterward.
+- **Smart ghost AI**
+  - *Chase mode*: the lead ghost uses a custom **Breadth-First Search (BFS)** pathfinder to find the shortest route to Pac-Man through the maze graph.
+  - *Flee mode*: when Pac-Man eats a super pacgum, ghosts evaluate all open neighboring cells and move toward the one that **maximizes Euclidean distance** from the player.
+  - *Wander mode*: idle ghosts pick a random target cell and path to it with the same BFS logic, so movement never looks scripted.
+- **Full game loop**: pacgums, super pacgums (in the four maze corners), score tracking, lives, per-level countdown timer, and win/lose states.
+- **Cheat / demo mode**: doubled movement speed, invincibility, and instant level-skip (`L` key) — used for testing and demoing gameplay quickly.
+- **Persistent highscore board**: scores are stored in a local JSON file, kept sorted, and capped at the top 10 entries.
+- **Complete UI flow**: animated main menu, in-game pause overlay, a controls/help screen, a scoreboard screen, and a game-over screen with live username input and validation.
+- **Configurable via JSON**: lives, pacgum counts, point values, level timers, and the maze seed are all adjustable through a `config.json` file, with safe fallback defaults if a value is missing or invalid.
 
 ---
 
-## 🚀 Execution & Usage
+## 🛠️ Tech Stack
 
-The application requires a virtual environment to manage the Pygame and Maze Generator dependencies cleanly.
+| Area | Tool / Library |
+|---|---|
+| Language | Python 3, fully type-hinted |
+| Rendering & input | [Pygame](https://www.pygame.org/) |
+| Maze generation | Custom external `.whl` package |
+| Data persistence | JSON (config + highscores) |
+| Pathfinding | Custom BFS implementation using `queue.Queue` |
 
-**Environment Setup:**
+---
+
+## 🧠 What I Focused On
+
+- **Separation of concerns**: game-state logic (movement, collisions, scoring) is kept distinct from rendering code, which made the project much easier to debug and extend as features were added.
+- **Algorithmic thinking**: implementing BFS pathfinding on a grid represented as bitmask wall data (`NESW` open/closed per cell) rather than relying on a pre-built graph library.
+- **Robust I/O handling**: a dedicated parser class manages config loading (with comment support and fallback defaults) and highscore persistence, isolating file-handling errors from the game loop.
+- **Finite-state style UI flow**: every screen (menu, pause, controls, scoreboard, game over) is its own self-contained loop with consistent event handling, which mirrors how simple state machines are built in game development.
+
+---
+
+![alt text](<play.png>)
+
+## 🚀 Running the Game
+
 ```bash
+# Create and activate a virtual environment
 make env
 source .env/bin/activate
+
+# Install dependencies (including the maze generator package)
 make install
-make run 
+
+# Configure the game (see below), then run
+make run
 ```
+
+This runs `python3 pac-man.py config.json`.
+
+### Controls
+| Key | Action |
+|---|---|
+| Arrow Keys | Move Pac-Man |
+| Esc | Pause |
+| L | Skip level (only active in demo/cheat mode) |
+
+---
+
+## ⚙️ Configuration
+
+Game parameters are controlled through `config.json`. Any missing or invalid value automatically falls back to a sensible default.
+
+| Key | Description | Default |
+|---|---|---|
+| `highscore_filename` | JSON file used to load/store the top 10 scores | `score_board.json` |
+| `lives` | Player lives across all levels | `3` |
+| `pacgum` | Number of pacgums per maze | `42` |
+| `points_per_pacgum` | Points for a normal pacgum | `10` |
+| `points_per_super_pacgum` | Points for a super pacgum | `50` |
+| `points_per_ghost` | Points for eating an edible ghost | `200` |
+| `seed` | Random seed for level 1's maze | `42` |
+| `level_max_time` | Time limit per level (seconds) | `90` |
+
+---
+
+## 🏆 Highscore System
+
+Scores are stored locally as JSON rather than in a database — a deliberate choice for a lightweight, dependency-free, single-player arcade game. On save, the board is loaded, the new score is inserted if it beats the current lowest of the top 10, the list is re-sorted, and any overflow entry is dropped.
+
+---
+
+## 🧩 Architecture
+
+```
+Game            → main game loop, level progression, entity & UI management
+JsonParser      → config parsing (with comment support), fallback defaults, highscore I/O
+MazeGenerator   → external package providing procedurally generated maze layouts
+```
+
+Helper utilities (`collidePoint`, `collideRect`, `dec_to_bin`) keep collision detection and bitmask-to-wall conversion logic small, testable, and reusable across the codebase.
+
+---
+
+## 📌 Notes
+
+This project was originally built as part of a structured coding curriculum and has since been cleaned up and shared here as a portfolio piece to demonstrate applied skills in Python, game development, algorithms, and software architecture.
+
+Feedback and suggestions are welcome — feel free to open an issue or reach out!

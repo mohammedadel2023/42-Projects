@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pacman"
+version = "1.0.0"
+authors = [
+  {name = "mkhashan", email = "mohammedkhashan2005@gmail.com"},
+  {name = "klafi", email = "shockrobot@gmail.com"}
+]
+description = "A utility package for pac_man game with all it's features(scoreboard, cheat mode, controls)"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "mazegenerator==2.0.1",
+    "pygame==2.6.1"
+]
+
+

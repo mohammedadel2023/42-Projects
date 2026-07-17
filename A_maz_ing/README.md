@@ -1,6 +1,8 @@
 # 🧩 Amazing: Procedural Maze Generation & Pathfinding Engine
 
-*This project has been created as part of the 42 curriculum by Mohammad Khashan and Kanaan Lafi.*
+**This project has been created as part of the 42 curriculum by Mohammad Khashan and Kanaan Lafi.**
+
+**This repository contains my personal solutions for the 42 curriculum. It is provided for portfolio and educational purposes only. Active 42 students must not copy or use this code, as doing so violates the school's strict academic integrity policies and will result in severe penalties for plagiarism**
 
 A modular Python package designed to dynamically generate, solve, and visually render both perfect and imperfect mazes using graph theory algorithms. The system is built with a strict Object-Oriented approach, allowing the core generation engine to be exported as a standalone Python Wheel (`.whl`) for integration into external graphical applications.
 

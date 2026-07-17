@@ -1,7 +1,9 @@
 # 🐳 Inception: Systems Architecture Teardown
+**This project has been created as part of the 42 curriculum by Mohammad Khashan.**
 
-*This document serves as the technical breakdown and architectural analysis for the 42 Inception project.*
+**This document serves as the technical breakdown and architectural analysis for the 42 Inception project.**
 
+**This repository contains my personal solutions for the 42 curriculum. It is provided for portfolio and educational purposes only. Active 42 students must not copy or use this code, as doing so violates the school's strict academic integrity policies and will result in severe penalties for plagiarism**
 ## 1. Project Overview
 Inception is a System Administration exercise designed to broaden knowledge of containerization and DevOps infrastructure. The objective is to build a small, highly secure, isolated microservice web application cluster from scratch, completely avoiding pre-built vendor images (like the official Docker Hub WordPress or MariaDB images).
 
