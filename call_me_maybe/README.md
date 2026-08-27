@@ -1,7 +1,13 @@
 *This activity has been created as part of the 42 curriculum by mkhashan.*
  
 # call me maybe — Function Calling with Constrained Decoding
- 
+
+ ## 📌 Notes
+
+This project was originally built as part of a structured coding curriculum and has since been cleaned up and shared here as a portfolio piece to demonstrate applied skills in Python, game development, algorithms, and software architecture.
+
+Feedback and suggestions are welcome — feel free to open an issue or reach out!
+
 ## Description
  
 This project implements a **function calling tool** that turns natural-language prompts into
