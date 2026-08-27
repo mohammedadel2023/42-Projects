@@ -30,6 +30,12 @@ Below are the initial technical breakdowns. Each section links to an in-depth ex
 * **Documentation Link:** [Read the Inception Teardown](./Inception/README.md)
 * **Source Code:** [View Inception Source](./Inception/src)
 
+### 📞 [Call Me Maybe (Function Calling)](./call_me_maybe/README.md)
+* **Domain:** LLM Inference & Structured Output Engineering
+* **Core Focus:** Turning natural-language prompts into guaranteed-valid JSON function calls using a local 0.6B-parameter LLM (`Qwen3-0.6B`) and **constrained decoding** — masking token logits at every generation step so only schema-compliant tokens can be selected, making hallucinated or malformed output structurally impossible.
+* **Documentation Link:** [Read the Call Me Maybe Teardown](./call_me_maybe/README.md)
+* **Source Code:** [View Call Me Maybe Source](./call_me_maybe/src)
+
 ---
 
 *This documentation will update repeatedly as I progress through the curriculum.*
