@@ -7,6 +7,12 @@ import numpy.typing as npt
 import json
 import os
 import sys
+import re
+
+
+def fix_json_escapes(s: str) -> str:
+
+    return re.sub(r'(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r'\\\\', s)
 
 
 class ModelHandler(BaseModel):
@@ -264,35 +270,19 @@ definition is {func_def}"
 
     @validate_call
     def name_scenario(self, prompt_id: int) -> tuple[str, str]:
-        """
-        Generates the function name portion of the JSON output,
-        enforcing alignment with the allowed function names
-        defined in the parser.
-
-        Args:
-            prompt_id: The 1-based index of the current user
-            prompt being evaluated.
-
-        Returns:
-            A tuple containing:
-            1. The accumulated JSON string constructed so far.
-            2. The specific function name string successfully
-               predicted by the model.
-
-        Raises:
-            ValueError: If the model enters a state where no valid
-            next tokens exist to complete an allowed function name.
-        """
         if self.parser:
-            response = '{"prompt":"'
-            if self.user_prompts:
-                response += self.user_prompts[prompt_id - 1].replace('"', "'")
-            else:
+            if not self.user_prompts:
                 print("the prompt does not exist")
                 sys.exit()
-            response += '","name": "'
-            if self.parser.func_def_dict:
-                func_names = list(self.parser.func_def_dict.keys())
+
+            user_prompt = self.user_prompts[prompt_id - 1]
+
+            escaped_prompt = json.dumps(user_prompt)
+
+            response = f'{{"prompt":{escaped_prompt},"name": "'
+
+            func_names = (list(self.parser.func_def_dict.keys())
+                          if self.parser.func_def_dict else [])
             func_name_response = ""
 
             while not (func_name_response in func_names):
@@ -304,8 +294,7 @@ definition is {func_def}"
                             valid_next_tokens.append(token_str)
 
                 if not valid_next_tokens:
-                    raise ValueError("No valid tokens found" +
-                                     f"to continue: {func_name_response}")
+                    raise ValueError(f"No valid tokens {func_name_response}")
 
                 token = self.predict_next_token(
                     user_prompt_id=prompt_id,
@@ -343,7 +332,7 @@ definition is {func_def}"
         if not response.endswith("{"):
             response += ", "
         response += f'"{param_name}":'
-
+        res = ""
         if expected_type == "number" or expected_type == "integer":
             whitelist = self.get_number_whitelist()
             while True:
@@ -353,13 +342,21 @@ definition is {func_def}"
                     include=whitelist,
                     func_name=func_name
                 )
-                if "," in token or "}" in token:
-                    clean_token = token.replace(",", "").replace("}", "")
+                boundary_positions = [
+                    position for position, char in enumerate(token)
+                    if char in ",}"
+                ]
+                if boundary_positions:
+                    clean_token = token[:min(boundary_positions)]
                     response += clean_token
+                    res += clean_token
                     break
                 response += token
+                res += token
                 if len(response) > 500:
                     break
+            if "." not in res and expected_type == "number":
+                response += ".0"
 
         else:
             response += '"'
@@ -370,10 +367,17 @@ definition is {func_def}"
                     func_name=func_name
                 )
                 token = token.replace("\n", "").replace("\r", "")
-                if '"' in token or "}" in token or "," in token:
-                    clean_token = token.replace('"', "").replace("}", "")
-                    clean_token = clean_token.replace(",", "")
-                    response += clean_token
+                closing_quote = None
+                for position, char in enumerate(token):
+                    if char != '"':
+                        continue
+                    preceding = response + token[:position]
+                    backslashes = len(preceding) - len(preceding.rstrip("\\"))
+                    if backslashes % 2 == 0:
+                        closing_quote = position
+                        break
+                if closing_quote is not None:
+                    response += token[:closing_quote]
                     break
                 response += token
                 if len(response) > 500:
@@ -408,14 +412,15 @@ definition is {func_def}"
                                                    func_name, expected_type,
                                                    prompt_id)
             llm_response += '}}'
+
+            fixed_json = fix_json_escapes(llm_response)
             try:
-                _ = json.loads(llm_response)
-            except json.JSONDecodeError:
-                print("Warning: LLM generated invalid JSON.")
-            return llm_response
+                _ = json.loads(fixed_json)
+            except json.JSONDecodeError as e:
+                print(f"Warning: LLM generated invalid JSON: {e}")
+            return fixed_json
         else:
-            print("parser is None")
-            sys.exit()
+            raise ValueError("no input")
 
     @validate_call
     def get_number_whitelist(self) -> list[str]:
