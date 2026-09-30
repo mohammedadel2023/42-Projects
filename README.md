@@ -14,7 +14,7 @@ Below are the initial technical breakdowns. Each section links to an in-depth ex
 
 ### 🤖 [Rag against the machine](./Rag-against-the-machine/README.md)
 * **Domain:** RAG & Information Retrieval
-* **Core Focus:** Implementation of a retrieval-augmented generation pipeline using BM25 for lexical search and local LLM inference (via llama.cpp/Transformers) to answer questions over a codebase and documentation corpus.
+* **Core Focus:** Implementation of a retrieval-augmented generation pipeline using BM25 & faiss for hybrid search (lexical & semantic)  and local LLM inference (via llama.cpp/Transformers) to answer questions over a codebase and documentation corpus.
 * **Documentation Link:** [Read the Rag against the machine Teardown](./Rag-against-the-machine/README.md)
 * **Source Code:** [View Rag against the machine Source](./Rag-against-the-machine/src)
 
